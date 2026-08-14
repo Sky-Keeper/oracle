@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>infinity</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+html,body{margin:0;padding:0;background:transparent;overflow:hidden}
+.love-infinity{width:190px;margin:4px auto;overflow:visible;
+  animation:infinity-sway 4s ease-in-out infinite alternate}
+.love-infinity a{text-decoration:none}
+.love-infinity svg{width:100%;overflow:visible;
+  filter:drop-shadow(0 0 2px rgba(180,40,50,.28)) drop-shadow(0 0 5px rgba(150,20,35,.14));
+  animation:infinity-glow 2.2s ease-in-out infinite}
+.love-infinity text{font-family:'Great Vibes',cursive;font-size:42px;font-style:normal;
+  letter-spacing:.2px;fill:#111}
+.love-infinity .hl{fill:#8B0000}
+@keyframes infinity-sway{from{transform:translateX(-5px)}to{transform:translateX(5px)}}
+@keyframes infinity-glow{0%,100%{opacity:.9}50%{opacity:1}}
+</style>
+</head>
+<body>
+
+<div class="love-infinity">
+  <a href="https://konami.rusff.me/profile.php?id=108" target="_blank">
+    <svg viewBox="0 0 500 180" id="i8svg">
+      <defs>
+        <path id="infinity-path"
+          d="M250,90
+             C190,10 85,10 65,90
+             C45,170 165,170 250,90
+             C335,10 455,10 435,90
+             C415,170 310,170 250,90" />
+      </defs>
+      <!-- скрытая строка для замера длины одной цитаты -->
+      <text id="i8measure" x="-9999" y="-9999" visibility="hidden"></text>
+      <text><textPath id="i8tp" href="#infinity-path" startOffset="0"></textPath></text>
+    </svg>
+  </a>
+</div>
+
+<script>
+(function(){
+var UNIT='пахнет твоей страстью, в моём доме опустелом, разорвёт на части, моё <tspan class="hl">сердце</tspan> под прицелом \u2726 ';
+var PLAIN='пахнет твоей страстью, в моём доме опустелом, разорвёт на части, моё сердце под прицелом \u2726 ';
+var SPEED=26; /* пикселей в секунду — больше значит быстрее */
+
+function start(){
+  var path=document.getElementById('infinity-path');
+  var tp=document.getElementById('i8tp');
+  var m=document.getElementById('i8measure');
+
+  var L=path.getTotalLength();          /* длина контура */
+  m.textContent=PLAIN;
+  var Q=m.getComputedTextLength();      /* длина одной цитаты */
+  if(!Q){setTimeout(start,120);return}
+
+  /* повторяем столько раз, чтобы хватило перекрыть контур с запасом */
+  var n=Math.ceil(L/Q)+2;
+  tp.innerHTML=new Array(n+1).join(UNIT);
+
+  /* сдвигаем ровно на одну цитату — на стыке картинка совпадает сама с собой */
+  var a=document.createElementNS('http://www.w3.org/2000/svg','animate');
+  a.setAttribute('attributeName','startOffset');
+  a.setAttribute('values','0;'+(-Q));
+  a.setAttribute('dur',(Q/SPEED).toFixed(2)+'s');
+  a.setAttribute('repeatCount','indefinite');
+  a.setAttribute('calcMode','linear');
+  tp.appendChild(a);
+}
+if(document.readyState!=='loading')start();else document.addEventListener('DOMContentLoaded',start);
+})();
+</script>
+</body>
+</html>
