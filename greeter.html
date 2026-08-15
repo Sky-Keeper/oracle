@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>greeter</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&display=swap');
+html,body{margin:0;padding:0;background:transparent;overflow:hidden;font-family:Georgia,serif}
+@keyframes gIn{0%{opacity:0;transform:translateY(4px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes gDot{0%,100%{opacity:.35;transform:translateY(0)}50%{opacity:1;transform:translateY(-2px)}}
+.g{display:inline-block;max-width:400px;padding:4px 10px;text-align:center;cursor:default}
+.g *{box-sizing:border-box}
+.g .lab{display:block;font-size:8px;letter-spacing:2.6px;text-transform:uppercase;color:#a8825a}
+.g .lab i{display:inline-block;width:4px;height:4px;border-radius:50%;background:#8B0000;
+  margin-right:5px;vertical-align:1px;animation:gDot 1.8s ease-in-out infinite}
+.g .msg{display:block;font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;font-style:italic;
+  color:#111;line-height:1.4;margin-top:3px;min-height:42px}
+.g .msg.new{animation:gIn .45s ease-out}
+</style>
+</head>
+<body>
+<center>
+<div class="g" id="gbox">
+  <span class="lab"><i></i><span id="glab">сейчас</span></span>
+  <span class="msg" id="gmsg"></span>
+</div>
+</center>
+<script>
+(function(){
+var BY_HOUR=[
+ {from:5, lab:'раннее утро', t:'Ты чего в такую рань? Ладно, заходи. Чай ещё горячий.'},
+ {from:9, lab:'утро',        t:'Доброе. Хотя ты и без «доброго» прекрасно справляешься.'},
+ {from:12,lab:'день',        t:'Днём ты выглядишь честнее. Мне это не нравится.'},
+ {from:17,lab:'вечер',       t:'Вечер — лучшее время делать вид, что мы просто разговариваем.'},
+ {from:21,lab:'ночь',        t:'Ночью все смелее. Проверим?'},
+ {from:1, lab:'глубокая ночь',t:'В такое время сюда заходят не случайно. Я знаю.'}
+];
+var HOVER=[
+'Смотришь.',
+'Всё ещё смотришь.',
+'Третий раз. Я считаю, вообще-то.',
+'И что ты тут забыл?',
+'Ищешь что-то конкретное или просто любуешься?',
+'Ладно, признаю — мне нравится.',
+'Ну хватит уже. Или не хватит?',
+'Тебе не идёт без меня. Я же говорила.',
+'Официально: ты попался.',
+'Это уже не любопытство, это диагноз.',
+'Мышка не устала? А ты?',
+'Я начинаю думать, что у тебя нет других вкладок.',
+'Скучно? Понимаю. Мне тоже.',
+'Ты серьёзно продолжаешь?',
+'Между нами что-то есть. Курсор, например.',
+'Я бы на твоём месте уже постеснялась.',
+'Ставлю на то, что ты не остановишься.',
+'Выиграла. Ты не остановился.',
+'Обычно на этом месте люди сдаются.',
+'Ты не обычный. Это комплимент. Наверное.',
+'Если ждёшь чего-то особенного — не дождёшься.',
+'Хотя ладно. Ты уже особенный.',
+'Двадцать раз. Я сбилась, но чувствую, что двадцать.',
+'Тебе точно нечем заняться.',
+'Мне это льстит. Не говори никому.',
+'Ты как заноза. Красивая, но заноза.',
+'Я устала притворяться, что мне всё равно.',
+'Ещё раз — и я решу, что это свидание.',
+'Поздно. Уже решила.',
+'Ты вообще моргаешь?',
+'Признавайся: ты меня преследуешь.',
+'Не отвечай. Мне нравится версия, где преследуешь.',
+'У меня кончились слова. Придумай что-нибудь сам.',
+'Ладно, ещё немного осталось.',
+'Ты упрямее, чем я думала. Уважаю.',
+'Мы с тобой уже дольше, чем некоторые браки.',
+'Сколько можно? Ответ: ещё немного можно.',
+'У меня кончаются остроты. У тебя — терпение?',
+'Нет? Ну ты и чудовище.',
+'Я бы предложила чай, но ты же не уйдёшь.',
+'Кажется, это уже привычка.',
+'Плохая привычка. Продолжай.',
+'Тебе не надоело? Мне — нет.',
+'Мы могли бы просто поговорить, знаешь.',
+'Хотя так тоже неплохо.',
+'Я запомню каждое твоё движение курсором.',
+'Отчёт составлю позже. Пока наслаждаюсь.',
+'Ты понимаешь, что это уже перебор?',
+'Понимаешь. И всё равно продолжаешь.',
+'Ну ладно. Ты победил. Я твоя.'
+];
+var lab=document.getElementById('glab'),msg=document.getElementById('gmsg'),box=document.getElementById('gbox');
+var n=0,idle=null;
+function pickHour(){
+  var h=new Date().getHours(),best=BY_HOUR[0],d=99;
+  for(var i=0;i<BY_HOUR.length;i++){var x=(h-BY_HOUR[i].from+24)%24;if(x<d){d=x;best=BY_HOUR[i]}}
+  return best;
+}
+function show(t,l){if(l)lab.textContent=l;msg.innerHTML=t;
+  msg.classList.remove('new');void msg.offsetWidth;msg.classList.add('new')}
+function greet(){var g=pickHour();show(g.t,g.lab)}
+greet();
+box.addEventListener('mouseenter',function(){
+  clearTimeout(idle);
+  show(HOVER[n % HOVER.length],'ты снова здесь');
+  n++;
+  idle=setTimeout(greet,9000);
+});
+})();
+</script>
+</body>
+</html>
